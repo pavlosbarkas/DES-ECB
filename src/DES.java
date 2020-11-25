@@ -173,7 +173,6 @@ public class DES {
 
     //This method handles the key input from the user. The key entered must
     //be 64 bits long or it isn't accepted.
-    //TODO check key input if it is hexadecimal number.
     private static String inputKey(){
         String inputKey = "";
 
