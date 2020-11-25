@@ -109,25 +109,49 @@ public class DES {
         initialKey = inputKey();
         binaryKey = hexToBinary(initialKey);
         permutedKey = keyPc1Permutation(binaryKey);
+        System.out.println("The plaintext " +plainText +" converted to binary is: \n" + binaryPlainText +"\n");
+        System.out.println("The given key " + initialKey +" converted to binary is: \n" +binaryKey
+                            +"\nThe permuted with PC1 table key is: \n" +permutedKey +"\n");
 
         cdKeysCreation(permutedKey);
+        System.out.println("The C and D subkeys are: ");
+        for (int i=0; i< cKeys.length; i++){
+            System.out.println("C" +(i+1) +" = " +cKeys[i]
+                                +" -- D" +(i+1) +" = " +dKeys[i]);
+        }
+
         keysBeforePC2Permutation = keysBeforePC2PermutationCreation();
+        System.out.println("\nThe keys after C and D concatenation are: ");
+        for (int i=0; i< keysBeforePC2Permutation.length; i++){
+            System.out.println((i+1) +": " +keysBeforePC2Permutation[i]);
+        }
+
         finalKeys = pc2Permutation(keysBeforePC2Permutation);
+        System.out.println("\nThe final keys that will be used for the encryption are: ");
+        for (int i=0; i< finalKeys.length; i++){
+            System.out.println("Key" +(i+1) +": " +finalKeys[i]);
+        }
 
         permutedPlainText = ipPermutation(binaryPlainText);
+        System.out.println("\nThe permuted with IP table plaintext is: \n" +permutedPlainText +"\n");
 
-        lrKeysCreation(permutedPlainText);
+        lrTextsCreation(permutedPlainText);
+        System.out.println("The L and R subtexts are: ");
+        for (int i=0; i< cKeys.length; i++){
+            System.out.println("L" +(i+1) +" = " +lTexts[i]
+                    +" -- R" +(i+1) +" = " +rTexts[i]);
+        }
 
         binaryCipherText = createBinaryCipherText();
+        System.out.println("\nThe ciphertext in binary is: \n" + binaryCipherText);
 
         permutedBinaryCipherText = ipReversePermutation(binaryCipherText);
+        System.out.println("\nThe permuted with IP_REVERSE table ciphertext is: \n" +permutedBinaryCipherText);
 
         cipherText = binaryToHex(permutedBinaryCipherText);
-
         cipherText = cipherText.toUpperCase();
-
-        System.out.println(cipherText);
-
+        System.out.println("\n\nEncrypting the plaintext: " +plainText +" \nwith the key: " +initialKey
+                            +" \nwith the use of DES(ECB) cipher \nproduces the ciphertext: " +cipherText +"\n");
     }
 
     //This method handles the plaintext input from the user.
@@ -298,7 +322,7 @@ public class DES {
 
     //This method splits the permuted initial text and then creates
     //the left and right tables of text.
-    private static void lrKeysCreation(String text){
+    private static void lrTextsCreation(String text){
         for (int i=0; i<17; i++){
             lTexts[i] = "";
             rTexts[i] = "";
