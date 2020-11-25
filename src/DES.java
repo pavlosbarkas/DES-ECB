@@ -121,7 +121,7 @@ public class DES {
                                 +" -- D" +(i+1) +" = " +dKeys[i]);
         }
 
-        keysBeforePC2Permutation = keysBeforePC2PermutationCreation();
+        keysBeforePC2Permutation = keysConcatenation();
         System.out.println("\nThe keys after C and D concatenation are: ");
         for (int i=0; i< keysBeforePC2Permutation.length; i++){
             System.out.println((i+1) +": " +keysBeforePC2Permutation[i]);
@@ -161,7 +161,7 @@ public class DES {
 
         //Check for correct input of key. Key length must be at maximum 64 bits.
         while(true){
-            System.out.println("Please insert plaintext with size of 64 bits maximum.");
+            System.out.println("Please insert plaintext with size of 64 bits maximum:");
             input = in.nextLine();
             if (input.length() <= 8)
                 break;
@@ -287,7 +287,7 @@ public class DES {
 
     //This method concatenates the C, D keys and prepares them
     //for the permutation according to the PC2 table.
-    private static String[] keysBeforePC2PermutationCreation(){
+    private static String[] keysConcatenation(){
         String[] keys = new String[16];
         for (int i=0; i<16; i++){
             keys[i] = "";
