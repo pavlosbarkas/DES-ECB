@@ -79,18 +79,39 @@ public class DES {
             {7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8},
             {2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}};
 
+    private static final int[] PF = {16, 7, 20, 21,
+                                29, 12, 28, 17,
+                                1, 15, 23, 26,
+                                5, 18, 31, 10,
+                                2, 8, 24, 14,
+                                32, 27, 3, 9,
+                                19, 13, 30, 6,
+                                22, 11, 4, 25};
+
+    private static final int[] IP_REVERSE = {40, 8, 48, 16, 56, 24, 64, 32,
+            39, 7, 47, 15, 55, 23, 63, 31,
+            38, 6, 46, 14, 54, 22, 62, 30,
+            37, 5, 45, 13, 53, 21, 61, 29,
+            36, 4, 44, 12, 52, 20, 60, 28,
+            35, 3, 43, 11, 51, 19, 59, 27,
+            34, 2, 42, 10, 50, 18, 58, 26,
+            33, 1, 41, 9, 49, 17, 57, 25};
+
     public static void main(String[] args) {
 
         String initialKey = "133457799BBCDFF1";
 
-        /*while(true){
-            System.out.println("Insert a 64bit hexademical key: ");
+        /*String initialKey = "";
+
+        while(true) {
+            System.out.println("Insert a 64bit hexadecical key: ");
             initialKey = in.nextLine();
             if (initialKey.length() == 16)
                 break;
         }*/
 
         initialKey = hexToBin(initialKey);
+
 
         System.out.println("The initial key converted to binary is:\n" +initialKey
                 +"\nIts size is " +initialKey.length() +" bits.\n");
@@ -218,16 +239,33 @@ public class DES {
 
 
 
-        String plainText = "0123456789ABCDEF";
+        //String plainText = "BARKASPA";
+        String plainText = "TYCHALAP";
 
-        plainText = hexToBin(plainText);
+        String binaryPlainText = "";
+        String s = "";
+        char[] c = new char[plainText.length()];
 
-        System.out.println("\nThe plainText converted to binary is: \n" +plainText);
+        for (int i=0; i<plainText.length(); i++){
+            c[i] = plainText.charAt(i);
+            int n = c[i];
+            s = Integer.toBinaryString(n);
+            if (s.length() < 8) {
+                for (int j=s.length(); j<8; j++) {
+                    s = "0" + s;
+                }
+            }
+            binaryPlainText += s;
+        }
+
+        //plainText = hexToBin(plainText);
+
+        System.out.println("\nThe plainText converted to binary is: \n" +binaryPlainText);
 
         String permutedPlainText = "";
 
         for (int i=0; i<IP.length; i++) {
-            permutedPlainText += plainText.charAt(IP[i]-1);
+            permutedPlainText += binaryPlainText.charAt(IP[i]-1);
         }
 
         if (permutedPlainText.equals("1100110000000000110011001111111111110000101010101111000010101010")){
@@ -236,6 +274,11 @@ public class DES {
 
         String[] lTexts = new String[17];
         String[] rTexts = new String[17];
+
+        for (int i=0; i<17; i++){
+            lTexts[i] = "";
+            rTexts[i] = "";
+        }
 
         lTexts[0] = permutedPlainText.substring(0, permutedPlainText.length()/2);
         rTexts[0] = permutedPlainText.substring(permutedPlainText.length()/2);
@@ -248,14 +291,50 @@ public class DES {
             System.out.println("R0 IS OK");
         }
 
-        function(rTexts[0], finalKeys[0]);
+        String functionTable = "";
 
+        for (int i=1; i<17; i++){
+            lTexts[i] = rTexts[i-1];
+            functionTable = function(rTexts[i-1], finalKeys[i-1]);
+            for (int j=0; j<functionTable.length(); j++){
+                rTexts[i] += lTexts[i-1].charAt(j) ^ functionTable.charAt(j);
+            }
+        }
 
+        if (lTexts[16].equals("01000011010000100011001000110100")){
+            System.out.println("L16 IS OK");
+        }
 
+        if (rTexts[16].equals("00001010010011001101100110010101")){
+            System.out.println("R16 IS OK");
+        }
 
+        String cipherTextBinary = "";
+        cipherTextBinary = rTexts[16].concat(lTexts[16]);
+
+        if (cipherTextBinary.equals("0000101001001100110110011001010101000011010000100011001000110100")){
+            System.out.println("CIPHERTEXT BINARY IS OK");
+        }
+
+        String cipherTextBinaryFinal = "";
+        for (int i=0; i<IP_REVERSE.length; i++){
+            cipherTextBinaryFinal += cipherTextBinary.charAt(IP_REVERSE[i]-1);
+        }
+
+        if (cipherTextBinaryFinal.equals("1000010111101000000100110101010000001111000010101011010000000101")){
+            System.out.println("IP_REVERSE IS OK");
+        }
+
+        String cipherText = new BigInteger(cipherTextBinaryFinal, 2).toString(16);
+
+        cipherText = cipherText.toUpperCase();
+
+        System.out.println(cipherText);
+        if (cipherText.equals("85E813540F0AB405")){
+            System.out.println("CIPHERTEXT IS OK");
+        }
 
     }
-
 
     private static String hexToBin(String s){
         s = s.replaceAll("0", "0000");
@@ -311,6 +390,8 @@ public class DES {
         int column;
         int whichSBox = 1;
 
+        String[] sBoxValues = new String[8];
+
         for (int i=0; i<48; i=i+6){
             temp = xorTable.substring(i, i+6);
 
@@ -329,28 +410,62 @@ public class DES {
             System.out.println("SBOX: " +whichSBox);
 
             if (whichSBox == 1){
-
+                sBoxValues[0] = Integer.toBinaryString(S1[row][column]);
+                System.out.println("SboxValue is:  " + sBoxValues[0]);
             }else if(whichSBox == 2){
-
+                sBoxValues[1] = Integer.toBinaryString(S2[row][column]);
+                System.out.println("SboxValue is:  " +sBoxValues[1]);
             }else if(whichSBox == 3){
-
+                sBoxValues[2] = Integer.toBinaryString(S3[row][column]);
+                System.out.println("SboxValue is:  " +sBoxValues[2]);
             }else if(whichSBox == 4){
-
+                sBoxValues[3] = Integer.toBinaryString(S4[row][column]);
+                System.out.println("SboxValue is:  " +sBoxValues[3]);
             }else if(whichSBox == 5){
-
+                sBoxValues[4] = Integer.toBinaryString(S5[row][column]);
+                System.out.println("SboxValue is:  " +sBoxValues[4]);
             }else if(whichSBox == 6){
-
+                sBoxValues[5] = Integer.toBinaryString(S6[row][column]);
+                System.out.println("SboxValue is:  " +sBoxValues[5]);
             }else if(whichSBox == 7){
-
+                sBoxValues[6] = Integer.toBinaryString(S7[row][column]);
+                System.out.println("SboxValue is:  " +sBoxValues[6]);
             }else if(whichSBox == 8){
-
+                sBoxValues[7] = Integer.toBinaryString(S8[row][column]);
+                System.out.println("SboxValue is:  " +sBoxValues[7]);
             }
 
             whichSBox++;
 
         }
 
-        return "";
+        for (int i=0; i<8; i++){
+            if (sBoxValues[i].length() < 4){
+                for (int j=sBoxValues[i].length(); j<4; j++){
+                    sBoxValues[i] = "0" + sBoxValues[i];
+                }
+            }
+            System.out.println("SBOX Value " +(i+1) +"=" +sBoxValues[i]);
+            afterSBoxTable += sBoxValues[i];
+        }
+
+        System.out.println("\n" +afterSBoxTable +"\nLength = " +afterSBoxTable.length());
+
+        if (afterSBoxTable.equals("01011100100000101011010110010111")){
+            System.out.println("AfterSboxTable IS OK");
+        }
+
+        String functionResult = "";
+        for (int i=0; i<PF.length; i++){
+            functionResult += afterSBoxTable.charAt(PF[i]-1);
+        }
+
+        System.out.println("Function Table is = \n" +functionResult);
+        if (functionResult.equals("00100011010010101010100110111011")){
+            System.out.println("FUNCTION TABLE IS OK");
+        }
+
+        return functionResult;
     }
 
 }
