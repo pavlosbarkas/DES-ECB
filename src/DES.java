@@ -107,6 +107,7 @@ public class DES {
         binaryPlainText = convertStringToBinary(plainText);
 
         initialKey = inputKey();
+        in.close();
         binaryKey = hexToBinary(initialKey);
         permutedKey = keyPc1Permutation(binaryKey);
         System.out.println("The plaintext " +plainText +" converted to binary is: \n" + binaryPlainText +"\n");
