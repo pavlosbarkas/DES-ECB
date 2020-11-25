@@ -180,11 +180,34 @@ public class DES {
         while(true) {
             System.out.println("Insert a 64bit hexadecimal key: ");
             inputKey = in.nextLine();
-            if (inputKey.length() == 16)
+            if (inputKey.length() == 16 && isHex(inputKey))
                 break;
         }
 
         return inputKey;
+    }
+
+    //This method checks if the key inserted is a hexadecimal number.
+    private static boolean isHex(String str){
+
+        str = str.toUpperCase();
+
+        for (int i=0; i<str.length(); i++){
+
+            if (str.charAt(i) != '0' && str.charAt(i) != '1'
+                && str.charAt(i) != '2' && str.charAt(i) != '3'
+                    && str.charAt(i) != '4' && str.charAt(i) != '5'
+                    && str.charAt(i) != '6' && str.charAt(i) != '7'
+                    && str.charAt(i) != '8' && str.charAt(i) != '9'
+                    && str.charAt(i) != 'A' && str.charAt(i) != 'B'
+                    && str.charAt(i) != 'C' && str.charAt(i) != 'D'
+                    && str.charAt(i) != 'E' && str.charAt(i) != 'F'){
+                return false;
+            }
+        }
+
+        return true;
+
     }
 
     //Hexadecimal key inserted from user is converter to binary.
